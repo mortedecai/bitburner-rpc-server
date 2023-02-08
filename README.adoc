@@ -1,0 +1,4 @@
+# BitBurner RPC Server
+
+This project is an RPC server implementation for serving BitBurner files per the server https://bitburner.readthedocs.io/en/latest/remoteapi.html[docs].
+
