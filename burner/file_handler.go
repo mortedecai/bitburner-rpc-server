@@ -98,41 +98,8 @@ func (fh *FileHandler) HandleEvent(evt fsnotify.Event, watchedFolders []string) 
 		fh.handleDelete(evt, watchedFolders)
 	case evt.Op.Has(fsnotify.Write):
 		fh.logger.Infow("Writing")
+		fh.uploader.UploadFile(evt.Name, fh.stripFilename(evt.Name, watchedFolders))
 	default:
 		fh.logger.Infow("Other")
 	}
-	/*
-		strippedName := evt.Name
-		fh.logger.Debugw(methodName, "Full Filename", evt.Name, "Op", evt.Op.String())
-		if _, ok := fh.HasValidExtension(evt.Name); !ok {
-			fh.logger.Infow(methodName, "Valid Extension?", false)
-			return
-		}
-
-		if finfo, err := os.Stat(evt.Name); err != nil {
-			fh.logger.Errorw(methodName, "Stat File", evt.Name, "Error", err)
-			return
-		} else if finfo.IsDir() {
-			fh.logger.Infow(methodName, "Stat File", evt.Name, "Type", "Directory")
-			return
-		}
-
-		for _, v := range watchedFolders {
-			if strings.HasPrefix(strippedName, v) {
-				strippedName = strippedName[(len(v) + 1):]
-				break
-			}
-		}
-		fh.logger.Debugw(methodName, "Stripped Filename", strippedName, "Op", evt.Op.String(), "Has Subdir?", fh.HasSubdir(strippedName))
-		if fh.HasSubdir(strippedName) {
-			strippedName = "/" + strippedName
-		}
-
-		if evt.Op.Has(fsnotify.Remove) {
-			fh.logger.Infow(methodName, "Removing File", evt.Name)
-		}
-		if evt.Op.Has(fsnotify.Write) || evt.Op.Has(fsnotify.Create) {
-			fh.logger.Infow(methodName, "Posting File", evt.Name)
-			fh.uploader.UploadFile(evt.Name, strippedName)
-		}*/
 }

@@ -1,6 +1,8 @@
 package burner
 
 import (
+	"os"
+
 	"github.com/fsnotify/fsnotify"
 	"go.uber.org/zap"
 )
@@ -52,6 +54,40 @@ func (w *Watcher) handleEvents() {
 }
 
 func (w *Watcher) AddDirectory(path string) error {
+	const methodName = "AddDirectory"
+	var dirName string
+
+	// need to go through all the directory entries and go from there
+
+	w.logger.Infow(methodName, "Adding Directory", path)
 	w.folders = append(w.folders, path)
-	return w.spy.Add(path)
+
+	dirNames := make([]string, 1, 1)
+	dirNames[0] = path
+
+	for {
+		if len(dirNames) == 0 {
+			break
+		}
+
+		dirName, dirNames = dirNames[0], dirNames[1:]
+
+		if watchErr := w.spy.Add(dirName); watchErr != nil {
+			return watchErr
+		}
+		w.logger.Infow(methodName, "Watched Directory:", dirName)
+		if de, err := os.ReadDir(dirName); err != nil {
+			w.logger.Errorw(methodName, "Directory Read Error", err)
+			return err
+		} else {
+			for _, v := range de {
+				if v.IsDir() && v.Name() != ".git" {
+					lastDir := len(dirNames)
+					dirNames = append(dirNames, dirName+"/"+v.Name())
+					w.logger.Infow(methodName, "New Directory", dirNames[lastDir])
+				}
+			}
+		}
+	}
+	return nil
 }
