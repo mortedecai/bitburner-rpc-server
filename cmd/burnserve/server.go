@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/mortedecai/bitburner-rpc-server/burner"
+	"github.com/mortedecai/go-go-gadgets/env"
 	"go.uber.org/zap"
 )
 
@@ -17,7 +18,16 @@ func main() {
 	l, _ := zap.NewDevelopment()
 	logger = l.Sugar().Named("bbpusher")
 
-	w, err := burner.NewWatcher(logger)
+	var token string
+	if t, found := env.GetWithDefault("BB_API_TOKEN", ""); !found {
+		logger.Errorw("main", "API Token", "NOT FOUND", "EnvVar", "BB_API_TOKEN")
+		return
+	} else {
+		token = t
+		logger.Infow("main", "Token", token)
+	}
+
+	w, err := burner.NewWatcher(logger, token)
 	if err != nil {
 		logger.Fatalw("main", "Create Watcher Error", err)
 	}

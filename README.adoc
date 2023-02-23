@@ -1,4 +1,46 @@
-# BitBurner RPC Server
+= BitBurner RPC Server
 
-This project is an RPC server implementation for serving BitBurner files per the server https://bitburner.readthedocs.io/en/latest/remoteapi.html[docs].
+This project implements file watching (.js & .script) for the BitBurner game.
+
+On a file modification, it will take the appropriate action against the running BitBurner API Server.
+
+== Usage
+
+Run via the `go run` tool:
+
+```shell
+go run cmd/burnserve/server.go <path(s) to watch>
+```
+
+=== Single watched directory
+
+To run while watching a sibling diretory named `bitburner-scripts`:
+
+```shell
+BB_API_TOKEN=<val copied from BitBurner> go run cmd/burnserve/server.go ../bitburner-scripts
+```
+
+=== Single watched directory
+
+To run while watching sibling diretories named `bitburner-scripts` and `scripts-2`:
+
+```shell
+BB_API_TOKEN=<val copied from BitBurner> go run cmd/burnserve/server.go ../bitburner-scripts ../scripts-2
+```
+
+
+== How It Works
+
+This project makes use of the BitBurner API Server and was made possible through examination of the VSCode plugin as well as the BitBurner source code.
+
+It uses `github.com/fsnotify/fsnotify` to monitor the file system for changes and takes the following actions:
+
+*CREATE*, *WRITE*, *CHMOD*
+
+* Uploads the file to the server
+
+*DELETE*
+
+* Removes the file from the server
+
 

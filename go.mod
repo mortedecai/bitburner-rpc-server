@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/fsnotify/fsnotify v1.6.0
+	github.com/mortedecai/go-go-gadgets v0.2.1
 	go.uber.org/zap v1.24.0
 )
 

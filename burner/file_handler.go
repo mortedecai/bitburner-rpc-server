@@ -18,8 +18,8 @@ type FileHandler struct {
 	spy      *fsnotify.Watcher
 }
 
-func NewFileHandler(l *zap.SugaredLogger, s *fsnotify.Watcher) *FileHandler {
-	return &FileHandler{logger: l.Named("FileHandler"), uploader: NewFileUpload(l), spy: s}
+func NewFileHandler(l *zap.SugaredLogger, s *fsnotify.Watcher, token string) *FileHandler {
+	return &FileHandler{logger: l.Named("FileHandler"), uploader: NewFileUpload(l, token), spy: s}
 }
 
 func (fh *FileHandler) HasValidExtension(filename string) (string, bool) {

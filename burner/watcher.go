@@ -14,12 +14,12 @@ type Watcher struct {
 	folders []string
 }
 
-func NewWatcher(logger *zap.SugaredLogger) (*Watcher, error) {
+func NewWatcher(logger *zap.SugaredLogger, token string) (*Watcher, error) {
 	if w, err := fsnotify.NewWatcher(); err != nil {
 		return nil, err
 	} else {
 		watcher := &Watcher{spy: w, logger: logger.Named("Watcher"), folders: make([]string, 0)}
-		watcher.handler = NewFileHandler(watcher.logger, watcher.spy)
+		watcher.handler = NewFileHandler(watcher.logger, watcher.spy, token)
 		return watcher, nil
 	}
 }

@@ -14,6 +14,7 @@ import (
 type FileUpload struct {
 	logger *zap.SugaredLogger
 	client *http.Client
+	token  string
 }
 
 type FileData struct {
@@ -32,10 +33,11 @@ func NewFileData(filename string, strippedFilename string) (*FileData, error) {
 	return fd, nil
 }
 
-func NewFileUpload(logger *zap.SugaredLogger) *FileUpload {
+func NewFileUpload(logger *zap.SugaredLogger, token string) *FileUpload {
 	return &FileUpload{
 		logger: logger,
 		client: &http.Client{},
+		token:  token,
 	}
 }
 
@@ -63,7 +65,7 @@ func (fu *FileUpload) DeleteFile(strippedFilename string) bool {
 		req = r
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer naPKnS90HLgXL7CBDIa/NyI6fbzsgLGHVGwz6op9L3hmD57397D/DhidOd6sE1F5")
+	req.Header.Add("Authorization", "Bearer "+fu.token)
 	if r, err := fu.client.Do(req); err != nil {
 		fu.logger.Errorw(methodName, "Delete Error", err)
 		return false
@@ -77,7 +79,7 @@ func (fu *FileUpload) DeleteFile(strippedFilename string) bool {
 	if bodyData, err := io.ReadAll(response.Body); err == nil {
 		body = string(bodyData)
 	} else {
-		fu.logger.Errorw(methodName, "Response Body Error", err)
+		fu.logger.Errorw(methodName, "Response Body Error", err, "Token", fu.token)
 	}
 
 	fu.logger.Infow(methodName, "Response Code", response.StatusCode, "Response Status", response.Status, "Response Body", body)
@@ -115,7 +117,7 @@ func (fu *FileUpload) UploadFile(filename string, strippedFilename string) bool 
 		req = r
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer naPKnS90HLgXL7CBDIa/NyI6fbzsgLGHVGwz6op9L3hmD57397D/DhidOd6sE1F5")
+	req.Header.Add("Authorization", "Bearer "+fu.token)
 	if r, err := fu.client.Do(req); err != nil {
 		fu.logger.Errorw(methodName, "Post Error", err)
 		return false
@@ -129,10 +131,10 @@ func (fu *FileUpload) UploadFile(filename string, strippedFilename string) bool 
 	if bodyData, err := io.ReadAll(response.Body); err == nil {
 		body = string(bodyData)
 	} else {
-		fu.logger.Errorw(methodName, "Response Body Error", err)
+		fu.logger.Errorw(methodName, "Response Body Error", err, "Token", fu.token)
 	}
 
-	fu.logger.Infow(methodName, "Response Code", response.StatusCode, "Response Status", response.Status, "Response Body", body)
+	fu.logger.Infow(methodName, "Response Code", response.StatusCode, "Response Status", response.Status, "Response Body", body, "Token", fu.token)
 
 	return true
 }
